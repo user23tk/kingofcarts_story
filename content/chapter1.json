@@ -1,0 +1,22 @@
+{
+  "title": "L'inizio psichedelico",
+  "theme": "fantasy",
+  "scenes": [
+    {"id":1,"text":"{{PLAYER}} incontra {{KING}} in una foresta di cristallo.","options":[{"id":"A","label":"Segui il bagliore","pp_delta":1,"goto":2},{"id":"B","label":"Resti fermo","pp_delta":0,"goto":2}]},
+    {"id":2,"text":"La luce danza attorno."},
+    {"id":3,"text":"Un sentiero si divide in due.","options":[{"id":"A","label":"A destra","pp_delta":1,"goto":4},{"id":"B","label":"A sinistra","pp_delta":-1,"goto":4}]},
+    {"id":4,"text":"La sabbia canta sotto i passi."},
+    {"id":5,"text":"Appare l'Ansia Parlante.","options":[{"id":"A","label":"Affrontala","pp_delta":2,"goto":6},{"id":"B","label":"Fuggi","pp_delta":-2,"goto":6}]},
+    {"id":6,"text":"Il cielo diventa gelatina."},
+    {"id":7,"text":"Tre porte al neon brillano.","options":[{"id":"A","label":"Porta rossa","pp_delta":1,"goto":8},{"id":"B","label":"Porta blu","pp_delta":-1,"goto":8}]},
+    {"id":8,"text":"Un trono al neon ti aspetta."}
+  ],
+  "finale": {
+    "text": "{{KING}} sorride mentre il viaggio continua.",
+    "options": [
+      {"id":"A","label":"Accetti la missione","pp_delta":2},
+      {"id":"B","label":"Ti riposi","pp_delta":0},
+      {"id":"C","label":"Rifiuti","pp_delta":-2}
+    ]
+  }
+}
