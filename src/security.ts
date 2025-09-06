@@ -4,7 +4,13 @@ import { env } from './env.js';
 
 export function checkTelegramHeader(req: Request, res: Response, next: NextFunction) {
   const token = req.get('X-Telegram-Bot-Api-Secret-Token');
+  if (!token) {
+    console.warn('⚠️ Missing X-Telegram-Bot-Api-Secret-Token header');
+    res.status(403).end();
+    return;
+  }
   if (token !== env.TELEGRAM_SECRET_TOKEN) {
+    console.warn(`⚠️ Invalid Telegram secret token: ${token}`);
     res.status(403).end();
     return;
   }

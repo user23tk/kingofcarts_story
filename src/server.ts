@@ -6,11 +6,18 @@ import { fetch } from 'undici';
 async function sendMessage(chatId: number, text: string, keyboard?: any) {
   const body: any = { chat_id: chatId, text, parse_mode: 'HTML' };
   if (keyboard) body.reply_markup = keyboard;
-  await fetch(`https://api.telegram.org/bot${env.TELEGRAM_BOT_TOKEN}/sendMessage`, {
+  console.debug('➡️ Sending message payload:', JSON.stringify(body));
+  const res = await fetch(`https://api.telegram.org/bot${env.TELEGRAM_BOT_TOKEN}/sendMessage`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(body),
   });
+  if (!res.ok) {
+    const err = await res.text();
+    console.error(`❌ Telegram API error ${res.status}: ${err}`);
+    throw new Error(`Telegram API responded with ${res.status}`);
+  }
+  console.log(`✅ Message sent to chat ${chatId}`);
 }
 
 export async function handleUpdate(req: Request, res: Response) {
@@ -28,10 +35,14 @@ export async function handleUpdate(req: Request, res: Response) {
       if (text.startsWith('/start')) {
         const name = update.message.from?.first_name || 'avventuriero';
         await sendMessage(chatId, render('Benvenuto {{PLAYER}}! Io sono {{KING}}.', name), {
-          reply_keyboard: {
-            keyboard: [[{ text: '\u25B6\uFE0F Inizia' }, { text: '\ud83d\udcca Statistiche' }, { text: '\ud83d\udce3 Condividi' }]],
-            resize_keyboard: true,
-          }
+          keyboard: [
+            [
+              { text: '\u25B6\uFE0F Inizia' },
+              { text: '\ud83d\udcca Statistiche' },
+              { text: '\ud83d\udce3 Condividi' },
+            ],
+          ],
+          resize_keyboard: true,
         });
       } else if (text === '\u25B6\uFE0F Inizia') {
         await sendMessage(chatId, 'Iniziamo la tua avventura! 🏰\n\nTi trovi davanti al castello del Re dei Carrelli...');
@@ -49,13 +60,19 @@ export async function handleUpdate(req: Request, res: Response) {
       console.log(`🔘 Callback query: ${callbackData}`);
       
       await sendMessage(chatId, 'Scelta registrata: ' + callbackData);
-      
+
       // Rispondere al callback query per rimuovere il loading
-      await fetch(`https://api.telegram.org/bot${env.TELEGRAM_BOT_TOKEN}/answerCallbackQuery`, {
+      const answerRes = await fetch(`https://api.telegram.org/bot${env.TELEGRAM_BOT_TOKEN}/answerCallbackQuery`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ callback_query_id: update.callback_query.id }),
       });
+      if (!answerRes.ok) {
+        const err = await answerRes.text();
+        console.error(`❌ answerCallbackQuery error ${answerRes.status}: ${err}`);
+      } else {
+        console.log('✅ Callback query answered');
+      }
     }
     
     res.json({ ok: true });
