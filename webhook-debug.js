@@ -1,5 +1,5 @@
 // Script per debuggare il webhook di Telegram
-const { fetch } = require('undici');
+import { fetch } from 'undici';
 
 // Sostituisci con i tuoi valori reali
 const BOT_TOKEN = 'IL_TUO_BOT_TOKEN_REALE';
