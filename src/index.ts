@@ -34,12 +34,29 @@ app.listen(env.PORT, () => {
   console.log(`Listening on :${env.PORT}`);
   if (env.PUBLIC_BASE_URL && env.WEBHOOK_PATH_SECRET) {
     const url = `${env.PUBLIC_BASE_URL}/telegram/${env.WEBHOOK_PATH_SECRET}`;
+    console.log(`Setting webhook to: ${url}`);
+    
     fetch(`https://api.telegram.org/bot${env.TELEGRAM_BOT_TOKEN}/setWebhook`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ url, secret_token: env.TELEGRAM_SECRET_TOKEN }),
+      body: JSON.stringify({ 
+        url, 
+        secret_token: env.TELEGRAM_SECRET_TOKEN,
+        max_connections: 40,
+        allowed_updates: ["message", "callback_query"]
+      }),
     }).then((r) => r.json()).then((j: any) => {
-      console.log('setWebhook result', j.ok);
-    }).catch(() => {});
+      console.log('setWebhook result:', j.ok ? '✅ SUCCESS' : '❌ FAILED');
+      if (!j.ok) {
+        console.error('setWebhook error:', j.description);
+        console.error('Error code:', j.error_code);
+      } else {
+        console.log('✅ Webhook configured successfully!');
+      }
+    }).catch((error) => {
+      console.error('❌ Network error setting webhook:', error.message);
+    });
+  } else {
+    console.warn('⚠️ Webhook not configured: missing PUBLIC_BASE_URL or WEBHOOK_PATH_SECRET');
   }
 });
