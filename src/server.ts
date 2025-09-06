@@ -7,11 +7,19 @@ async function sendMessage(chatId: number, text: string, keyboard?: any) {
   const body: any = { chat_id: chatId, text, parse_mode: 'HTML' };
   if (keyboard) body.reply_markup = keyboard;
   console.debug('➡️ Sending message payload:', JSON.stringify(body));
-  const res = await fetch(`https://api.telegram.org/bot${env.TELEGRAM_BOT_TOKEN}/sendMessage`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(body),
-  });
+  let res;
+  try {
+    res = await fetch(`https://api.telegram.org/bot${env.TELEGRAM_BOT_TOKEN}/sendMessage`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    });
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    console.error('❌ Error sending message:', message);
+    console.error('➡️ Failed payload:', JSON.stringify(body));
+    throw error;
+  }
   if (!res.ok) {
     const err = await res.text();
     console.error(`❌ Telegram API error ${res.status}: ${err}`);
