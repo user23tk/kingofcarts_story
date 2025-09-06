@@ -1,8 +1,9 @@
 // Script per testare la connessione al bot Telegram
-const { fetch } = require('undici');
+import { fetch } from 'undici';
+import { config } from 'dotenv';
 
 // Leggi le variabili d'ambiente dal file .env
-require('dotenv').config();
+config();
 
 async function testBot() {
   const BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
